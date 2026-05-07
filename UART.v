@@ -21,61 +21,72 @@ always @(posedge clk, negedge rst_n) begin
     
     if (!rst_n) begin
         current_state <= IDLE;
-        counter <= 0;
-        index <= 0;
-        byte_ready <= 0;
+        counter <= 4'd0;
+        index <= 3'd0;
+        byte_ready <= 1'd0;
+        new_byte <= 8'd0;
+        final_byte <= 8'd0;
     end 
 
     else begin
 
-        byte_ready <= 0;
+        byte_ready <= 1'd0;
+        new_byte <= new_byte;
+        final_byte <= final_byte;
+        current_state <= current_state;
+        counter <= counter;
+        index <= index;
 
         case (current_state)
 
             IDLE : begin
-                if (rx == 0) begin
+                counter <= 4'd0;
+                index   <= 3'd0;
+
+                if (rx == 1'd0) begin
                     current_state <= START;
                 end
+                else current_state <= IDLE;
 
             end 
 
             START : begin
-                if (rx == 0) begin
-                    counter <= counter + 1;
-                    if (counter == 5) begin
+                if (rx == 1'd0) begin
+                    if (counter == 4'd5) begin
                         current_state <= DATA;
-                        counter <= 0;
+                        counter <= 4'd0;
                     end
+                    else counter <= counter + 4'd1;
                 end
                 else begin
-                    counter <= 0;
+                    counter <= 4'd0;
                     current_state <= IDLE;
                 end 
             end
 
             DATA : begin
-                if (counter == 10) begin
+                if (counter == 4'd10) begin
                     new_byte[index] <= rx;
-                    counter <= 0;
-                    if(index == 7) begin
+                    counter <= 4'd0;
+                    if(index == 3'd7) begin
                         current_state <= STOP;
-                        index <= 0;
+                        index <= 3'd0;
                     end
-                    else index <= index + 1;
+                    else index <= index + 3'd1;
                 end
-                else counter <= counter + 1;
+                else counter <= counter + 4'd1;
             end
 
             STOP : begin
-                if (counter == 10) begin
-                    counter <= 0;
-                    if (rx == 1) begin
+                if (counter == 4'd10) begin
+                    counter <= 4'd0;
+                    if (rx == 1'd1) begin
                         final_byte <= new_byte;
                         byte_ready <= 1'b1;
                     end
                     current_state <= IDLE;
                 end
-                else counter <= counter + 1;
+                else counter <= counter + 4'd1;
             end
 
 
@@ -84,12 +95,6 @@ always @(posedge clk, negedge rst_n) begin
         endcase 
 
     end
-
-
-
-
-
-
 
 
 end
