@@ -15,7 +15,8 @@ localparam [1:0]  IDLE = 2'b00,
                   DATA = 2'b10,
                   STOP = 2'b11;
 
-
+parameter [3:0] CYCLE_PER_BIT = 4'd10;
+                HALF_CYCLE_PER_BIT = 4'd5;
 
 always @(posedge clk, negedge rst_n) begin
     
@@ -52,7 +53,7 @@ always @(posedge clk, negedge rst_n) begin
 
             START : begin
                 if (rx == 1'd0) begin
-                    if (counter == 4'd5) begin
+                    if (counter == HALF_CYCLE_PER_BIT - 4'd1) begin
                         current_state <= DATA;
                         counter <= 4'd0;
                     end
@@ -65,7 +66,7 @@ always @(posedge clk, negedge rst_n) begin
             end
 
             DATA : begin
-                if (counter == 4'd10) begin
+                if (counter == CYCLE_PER_BIT - 4'd1) begin
                     new_byte[index] <= rx;
                     counter <= 4'd0;
                     if(index == 3'd7) begin
@@ -78,7 +79,7 @@ always @(posedge clk, negedge rst_n) begin
             end
 
             STOP : begin
-                if (counter == 4'd10) begin
+                if (counter == CYCLE_PER_BIT - 4'd1) begin
                     counter <= 4'd0;
                     if (rx == 1'd1) begin
                         final_byte <= new_byte;
