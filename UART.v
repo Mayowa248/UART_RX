@@ -15,7 +15,7 @@ localparam [1:0]  IDLE = 2'b00,
                   DATA = 2'b10,
                   STOP = 2'b11;
 
-parameter [3:0] CYCLE_PER_BIT = 4'd10;
+parameter [3:0] CYCLE_PER_BIT = 4'd10,
                 HALF_CYCLE_PER_BIT = 4'd5;
 
 always @(posedge clk, negedge rst_n) begin
